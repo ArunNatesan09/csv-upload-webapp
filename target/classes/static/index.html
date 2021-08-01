@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>CSV File Uploading to DB</title>
+<script type="text/javascript">
+/**
+* Upload the selected CSV file
+*/
+function uploadFile(form){
+     const formData = new FormData(form); // Get the form data
+     var oOutput = document.getElementById("output") // This object used to display sucess or failure messa
+     var oReq = new XMLHttpRequest(); // Creating Ajax
+         oReq.open("POST", "http://localhost:8080/api/csv/upload", true);
+     oReq.onload = function(oEvent) {
+         if (oReq.status == 200) { // On sucessfull upload.
+          var resObject=JSON.parse(oReq.response);
+          if(resObject.status=="Sucess") {
+                var htmlStr ="<h3>Sucessfull uploaded</h3";
+	           htmlStr +="<div>Total Records processed "+ resObject.totalRecords+"</div>";
+	           htmlStr +="<div>Total Sucess  "+ resObject.sucessRecords+"</div>";
+	           htmlStr +="<div>Total Failure  "+ resObject.failureRecords+"</div>"
+	           htmlStr +="<div>Total Timetaken  "+ resObject.toalTimeTaken+"</div>"
+	           oOutput.innerHTML = htmlStr;
+          } else {
+           oOutput.innerHTML = "Something went wrong while processing the records...!";
+          }
+			document.getElementById("csv-upload").reset();
+         } else {
+           oOutput.innerHTML = "Error occurred when trying to upload your file.<br \/>";
+         }
+       };
+     oOutput.innerHTML = "Sending file!";
+
+     oReq.send(formData);
+     
+    }
+</script>
+<style>
+input {
+	width: 200px;
+}
+h1 {
+	border-bottom: 2px solid #CCC;
+	margin-bottom:40px;
+}
+h3 {
+	margin-top:40px;
+}
+</style>
+</head>
+<body>
+
+	<h1>CSV Uploading to DB</h1>
+	<div>
+		<form name="csv-upload" id="csv-upload" action="#" onsubmit='return false'>
+			<label>Please browse the File name (.csv)</label> 
+			<input id="file" type="file" name="file" />
+			<button id="upload-button" onclick="uploadFile(this.form)">Upload</button>
+		</form>
+	</div>
+
+	<div id="output"></div>
+</body>
+</html>
